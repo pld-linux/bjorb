@@ -6,7 +6,6 @@ License:	see COPYRIGHT, modified is not distributable
 Group:		Networking/Daemons
 Source0:	http://people.FreeBSD.org/~foxfair/distfiles/%{name}-%{version}.tar.gz
 # Source0-md5:	abea77967a1a0fd2dcd1b407d652b3bf
-# http://www.freebsd.org/cgi/cvsweb.cgi/ports/security/bjorb/files/
 Source1:	%{name}.init
 Patch0:		%{name}-fbsd_patches.patch
 Patch1:		%{name}-Makefile.in.patch
@@ -14,6 +13,8 @@ Patch2:		%{name}-sysconfdir.patch
 URL:		http://www.hitachi-ms.co.jp/bjorb/
 BuildRequires:	libstdc++-devel
 BuildRequires:	openssl-devel
+PreReq:		rc-scripts
+Requires(post,preun):	/sbin/chkconfig
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
