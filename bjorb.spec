@@ -1,9 +1,9 @@
 # TODO: initscript
-Summary:	Bjorb - secure TCP relay software.
+Summary:	Bjorb - secure TCP relay software
 Name:		bjorb
 Version:	0.5.5p1
 Release:	0.1
-License:	see COPYRIGHT
+License:	see COPYRIGHT, modified is not distributable
 Group:		Networking/Daemons
 Source0:	http://people.FreeBSD.org/~foxfair/distfiles/%{name}-%{version}.tar.gz
 # Source0-md5:	abea77967a1a0fd2dcd1b407d652b3bf
