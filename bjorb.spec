@@ -25,20 +25,20 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Bjorb is secure TCP relay software. Bjorb provides you, secure
 end-to-end connection over insecure network such as Internet.
 Features:
- 1. Encrypt/decrypt any "static port" TCP connection with SSL.
- 2. Restrict access by IP address.
- 3. Server side certification.
- 4. Client side certification.
+- Encrypt/decrypt any "static port" TCP connection with SSL.
+- Restrict access by IP address.
+- Server side certification.
+- Client side certification.
 
 %description -l pl
 Bjorb to oprogramowanie do bezpiecznego przekazywania TCP. Bjorb
 udostêpnia bezpieczne po³±czenie koñcówek przez niebezpieczn± sieæ
 tak± jak Internet. Mo¿liwo¶ci:
-1. Szyfrowanie/odszyfrowywanie dowolnego po³±czenia TCP na "statycznym
-   porcie" przy u¿yciu SSL
-2. Ograniczanie dostêpu wed³ug adresów IP.
-3. Certyfikacja po stronie serwera.
-4. Certyfikacja po stronie klienta.
+- Szyfrowanie/odszyfrowywanie dowolnego po³±czenia TCP na "statycznym
+  porcie" przy u¿yciu SSL
+- Ograniczanie dostêpu wed³ug adresów IP.
+- Certyfikacja po stronie serwera.
+- Certyfikacja po stronie klienta.
 
 %prep
 %setup -q
