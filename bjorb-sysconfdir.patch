@@ -1,0 +1,12 @@
+diff -Nura bjorb-0.5.5p1/src/common.h.in bjorb-0.5.5p1.new/src/common.h.in
+--- bjorb-0.5.5p1/src/common.h.in	1999-02-22 03:40:47.000000000 +0100
++++ bjorb-0.5.5p1.new/src/common.h.in	2004-08-11 22:11:37.000000000 +0200
+@@ -15,7 +15,7 @@
+ 
+ #define LINEBUFSIZ 256
+ 
+-#define CONFIG_FILE_SEARCH_PATH ".;@prefix@/etc/"
++#define CONFIG_FILE_SEARCH_PATH ".;@sysconfdir@"
+ #define CONFIG_FILE_NAME        "bjorb.conf"
+ #define PIDFILE   "@PIDFILE@"
+ 

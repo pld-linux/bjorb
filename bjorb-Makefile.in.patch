@@ -1,0 +1,43 @@
+diff -Nura bjorb-0.5.5p1/src/Makefile.in bjorb-0.5.5p1.new/src/Makefile.in
+--- bjorb-0.5.5p1/src/Makefile.in	2004-08-11 21:31:14.000000000 +0200
++++ bjorb-0.5.5p1.new/src/Makefile.in	2004-08-11 21:55:49.000000000 +0200
+@@ -29,10 +29,11 @@
+ LDFLAGS =
+ LIBS = @LIBS@
+ 
++DESTDIR =
+ PREFIX ?= @prefix@
+ exec_prefix = $(PREFIX)
+-sbindir = $(exec_prefix)/sbin
+-etcdir = $(exec_prefix)/etc
++sbindir = @sbindir@
++etcdir = @sysconfdir@ 
+ 
+ CC = @CC@
+ RM = rm -rf
+@@ -45,9 +46,8 @@
+ 
+ ### SSL Configuration
+ 
+-SSLTOP      = @ssltop@
+-SSL_CFLAGS  = -I$(SSLTOP)/include
+-SSL_LDFLAGS = -L$(SSLTOP)/lib
++INCLUDEDIR = @includedir@
++SSL_CFLAGS  = -I$(INCLUDEDIR)/openssl
+ SSL_LIBS    = @ssllibs@
+ 
+ ###
+@@ -76,9 +76,10 @@
+ 
+ all:: $(TARGET)
+ install:: $(TARGET)
+-	$(INSTALL_PROGRAM) $(TARGET) $(sbindir)/$(TARGET)
+-	@if test ! -d $(etcdir) ; then mkdir $(etcdir); fi
+-	$(INSTALL_DATA) ../doc/sample/bjorb.conf.sample $(etcdir)/bjorb.conf.sample
++	@if test ! -d $(DESTDIR)$(sbindir) ; then mkdir -p $(DESTDIR)$(sbindir); fi
++	$(INSTALL_PROGRAM) $(TARGET) $(DESTDIR)$(sbindir)/$(TARGET)
++	@if test ! -d $(DESTDIR)$(etcdir) ; then mkdir -p $(DESTDIR)$(etcdir); fi
++	$(INSTALL_DATA) ../doc/sample/bjorb.conf.sample $(DESTDIR)$(etcdir)
+ 
+ $(TARGET): $(OBJS)
+ 	$(CXX) -o $(TARGET) $(ALL_LDFLAGS) $(OBJS) $(ALL_LIBS)
