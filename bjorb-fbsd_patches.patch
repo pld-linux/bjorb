@@ -1,0 +1,205 @@
+--- bjorb-0.5.5p1/src/Config-staff.cc.orig	Fri Feb 21 10:27:31 2003
++++ bjorb-0.5.5p1/src/Config-staff.cc	Fri Feb 21 10:27:47 2003
+@@ -342,7 +342,7 @@
+   PUTERR(1, ("Generating a %d bit RSA private key\n", bits));
+ 
+   EVP_PKEY *pkey = 0;
+-  EVP_MD   *digest = EVP_md5();
++  const EVP_MD   *digest = EVP_md5();
+   X509 *x509 = 0;
+   X509_NAME *n = 0;
+   X509_NAME_ENTRY *ne = 0;
+--- bjorb-0.5.5p1/src/Makefile.in.orig	Mon Feb 22 05:01:20 1999
++++ bjorb-0.5.5p1/src/Makefile.in	Sun Jan 12 14:46:10 2003
+@@ -29,7 +29,7 @@
+ LDFLAGS =
+ LIBS = @LIBS@
+ 
+-PREFIX = @prefix@
++PREFIX ?= @prefix@
+ exec_prefix = $(PREFIX)
+ sbindir = $(exec_prefix)/sbin
+ etcdir = $(exec_prefix)/etc
+@@ -81,7 +81,7 @@
+ 	$(INSTALL_DATA) ../doc/sample/bjorb.conf.sample $(etcdir)/bjorb.conf.sample
+ 
+ $(TARGET): $(OBJS)
+-	$(CC) -o $(TARGET) $(ALL_LDFLAGS) $(OBJS) $(ALL_LIBS)
++	$(CXX) -o $(TARGET) $(ALL_LDFLAGS) $(OBJS) $(ALL_LIBS)
+ 
+ debug::
+ 	$(MAKE) CFLAGS="-g -DDEBUG"
+@@ -116,13 +116,13 @@
+ 	$(CC) -c $(ALL_CFLAGS)  $<
+ 
+ .cc.o: Makefile
+-	$(CC) -c $(ALL_CFLAGS)  $<
++	$(CXX) -c $(ALL_CFLAGS)  $<
+ 
+ Makefile: Makefile.in
+ 	CONFIG_FILES=./$@ CONFIG_HEADERS= $(SHELL) ./config.status
+ 
+ cmd.o: cmd.cc cmd-def.h
+-	$(CC) -c $(ALL_CFLAGS)  $<
++	$(CXX) -c $(ALL_CFLAGS)  $<
+ cmd.cc: cmd.list
+ 	gperf -aptCT -N in_word_set_cmdlist $? > $@
+ bool.cc:bool.list
+@@ -135,9 +135,13 @@
+ 	autoconf
+ 
+ certificate::
+-	$(SSLTOP)/bin/req -new -x509 -out new.pem -nodes -days 365
+-	cat new.pem privkey.pem > $(etcdir)/bjorb.pem
+-	@rm new.pem privkey.pem
++	(\
++	[ -f $(PREFIX)/certs/bjorb.pem ] && exit 0; \
++	cd $(PREFIX)/certs; \
++	openssl req -new -x509 -nodes -days 365 -out bjorb.pem -keyout bjorb.pem; \
++	ln -s bjorb.pem `openssl x509 -noout -hash < bjorb.pem`.0 ;\
++	chmod 644 $(PREFIX)/certs/bjorb.pem; \
++	)
+ 
+ install-bsd::
+ 	@if test -f /etc/rc.bjorb ; then chmod +w /etc/rc.bjorb; fi
+--- bjorb-0.5.5p1/src/../doc/sample/bjorb.conf.sample.orig	Tue Jul  7 22:39:16 1998
++++ bjorb-0.5.5p1/src/../doc/sample/bjorb.conf.sample	Tue Aug 25 14:17:58 1998
+@@ -5,8 +5,8 @@
+ error_log	/var/log/bjorb-err.log
+ do_fork	        true
+ deny_wait       0
+-CA_cert_file    /usr/local/etc/bjorb.pem
+-CA_cert_path    /usr/local/etc/CA
++CA_cert_file    /usr/local/certs/bjorb.pem
++CA_cert_path    /usr/local/certs/CA
+ max_connection  100
+ spare_servers   1
+ 
+--- bjorb-0.5.5p1/src/configure.in.orig	Sun Feb 21 20:40:47 1999
++++ bjorb-0.5.5p1/src/configure.in	Sun Dec 26 12:02:27 1999
+@@ -16,6 +16,7 @@
+ 	prefix=$ac_default_prefix
+ fi
+ ssltop=$prefix/ssl
++ssllib=$prefix/ssl
+ 
+ dnl Checks for programs.
+ AC_PROG_AWK
+@@ -86,6 +87,13 @@
+ 
+ AC_SUBST(ssltop)
+ 
++# with SSL lib
++AC_ARG_WITH(ssllib,
++[  --with-ssllib=DIR specifies directory to put SSL libbary.],
++ssllib=$with_ssllib)
++
++AC_SUBST(ssllib)
++
+ dnl Checks for libraries.
+ 
+ # shared option
+@@ -100,12 +108,16 @@
+ 
+ # for USA_RESIDENT on FreeBSD
+ if test X$disable_ssl = X; then
+-  LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ssltop/lib"
++  LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ssllib"
+   export LD_LIBRARY_PATH
+ 
+-  AC_CHECK_LIB(RSAglue, ERR_load_RSAREF_strings,,,-lcrypto -lssl)
+-  AC_CHECK_LIB(rsaref, DES3_CBCInit)
+-  ssllibs="-lssl -lcrypto"
++  AC_MSG_CHECKING([for RSAref library])
++  saved_LIBS="-L$ssllib -lcrypto -lssl"
++  LIBS="$saved_LIBS -L${LOCALBASE}/lib -lRSAglue -lrsaref"
++  AC_TRY_LINK([], [],
++    [AC_MSG_RESULT(yes); ],
++    [AC_MSG_RESULT(no)]; LIBS="$saved_LIBS")
++  ssllibs="$LIBS"
+ fi
+ 
+ deflib()
+--- bjorb-0.5.5p1/src/Config.cc.orig	Mon Feb 22 04:07:51 1999
++++ bjorb-0.5.5p1/src/Config.cc	Sun Jan 12 14:34:28 2003
+@@ -334,7 +334,7 @@
+   int retval = 1;
+ 
+   SOCKADDR_IN sa_client;
+-  int addr_len = sizeof(SOCKADDR_IN);
++  unsigned int addr_len = sizeof(SOCKADDR_IN);
+ 
+ #ifndef NO_DEBUG
+   PUTERR(2, ("::accept() begin\n"));
+@@ -574,7 +574,7 @@
+   if (accept_port.getPortinfo()->isVerify()) {
+     _SSL_set_verify(ssl,
+ 		   SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
+-		   (int (*)(...))BjorbSSLVerifyCallback);
++		   BjorbSSLVerifyCallback);
+   } else {
+     _SSL_set_verify(ssl, SSL_VERIFY_NONE, 0);
+   }
+@@ -620,7 +620,7 @@
+   } else {
+     _SSL_CTX_set_verify(ctx_connect,
+ 		       SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT,
+-		       (int (*)(...))BjorbSSLVerifyCallback);
++		       BjorbSSLVerifyCallback);
+   }
+ 
+   ssl = _SSL_new(ctx_connect);
+--- bjorb-0.5.5p1/src/bool.cc.orig	Mon Feb 22 03:40:47 1999
++++ bjorb-0.5.5p1/src/bool.cc	Sun Jan 12 14:42:05 2003
+@@ -1,6 +1,11 @@
+ /* C code produced by gperf version 2.1 (K&R C version) */
+ /* Command-line: gperf -aptCT -N in_word_set_boollist bool.list  */
+ 
++#include "config.h"
++
++#ifdef HAVE_STRING_H
++#include <string.h>
++#endif /* HAVE_STRING_H */
+ 
+ #include "common.h"
+ #include "bool.h"
+--- bjorb-0.5.5p1/src/cmd.cc.orig	Mon Feb 22 03:40:47 1999
++++ bjorb-0.5.5p1/src/cmd.cc	Sun Jan 12 14:40:41 2003
+@@ -3,6 +3,11 @@
+ 
+ 
+ #include "config.h"
++
++#ifdef HAVE_STRING_H
++#include <string.h>
++#endif /* HAVE_STRING_H */
++
+ #include "cmd.h"
+ #include "Config.h"
+ #include "cmd-def.h"
+--- bjorb-0.5.5p1/src/portinfo.cc.orig	Mon Feb 22 03:40:47 1999
++++ bjorb-0.5.5p1/src/portinfo.cc	Sun Jan 12 14:40:05 2003
+@@ -1,3 +1,9 @@
++#include "config.h"
++
++#ifdef HAVE_STRING_H
++#include <string.h>
++#endif /* HAVE_STRING_H */
++
+ #include "common.h"
+ #include "portinfo.h"
+ #include "token.h"
+--- bjorb-0.5.5p1/src/portoption.cc.orig	Mon Feb 22 03:40:47 1999
++++ bjorb-0.5.5p1/src/portoption.cc	Sun Jan 12 14:41:00 2003
+@@ -3,6 +3,11 @@
+ 
+ 
+ #include "config.h"
++
++#ifdef HAVE_STRING_H
++#include <string.h>
++#endif /* HAVE_STRING_H */
++
+ #include "Config.h"
+ 
+ #define MIN_WORD_LENGTH 3
