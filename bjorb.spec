@@ -1,4 +1,5 @@
 Summary:	Bjorb - secure TCP relay software
+Summary(pl):	Bjorb - oprogramowanie do bezpiecznego przekazywania TCP
 Name:		bjorb
 Version:	0.5.5p1
 Release:	0.1
@@ -11,22 +12,33 @@ Patch0:		%{name}-fbsd_patches.patch
 Patch1:		%{name}-Makefile.in.patch
 Patch2:		%{name}-sysconfdir.patch
 URL:		http://www.hitachi-ms.co.jp/bjorb/
+BuildRequires:	autoconf
 BuildRequires:	libstdc++-devel
 BuildRequires:	openssl-devel
 PreReq:		rc-scripts
 Requires(post,preun):	/sbin/chkconfig
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
+%define		_sysconfdir	/etc/%{name}	
+
 %description
 Bjorb is secure TCP relay software. Bjorb provides you, secure
 end-to-end connection over insecure network such as Internet.
 Features:
  1. Encrypt/decrypt any "static port" TCP connection with SSL.
- 2. Restrcit access by IP address.
+ 2. Restrict access by IP address.
  3. Server side certification.
  4. Client side certification.
 
-%define _sysconfdir /etc/%{name}	
+%description -l pl
+Bjorb to oprogramowanie do bezpiecznego przekazywania TCP. Bjorb
+udostêpnia bezpieczne po³±czenie koñcówek przez niebezpieczn± sieæ
+tak± jak Internet. Mo¿liwo¶ci:
+1. Szyfrowanie/odszyfrowywanie dowolnego po³±czenia TCP na "statycznym
+   porcie" przy u¿yciu SSL
+2. Ograniczanie dostêpu wed³ug adresów IP.
+3. Certyfikacja po stronie serwera.
+4. Certyfikacja po stronie klienta.
 
 %prep
 %setup -q
@@ -42,9 +54,10 @@ cd src
 
 %install
 rm -rf $RPM_BUILD_ROOT
-cd src
-%{__make} install \
+
+%{__make} -C src install \
 	DESTDIR=$RPM_BUILD_ROOT
+
 mv -f $RPM_BUILD_ROOT%{_sysconfdir}/{bjorb.conf.sample,bjorb.conf}
 install -d $RPM_BUILD_ROOT/etc/rc.d/init.d
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
