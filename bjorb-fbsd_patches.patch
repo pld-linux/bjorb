@@ -70,8 +70,8 @@
  deny_wait       0
 -CA_cert_file    /usr/local/etc/bjorb.pem
 -CA_cert_path    /usr/local/etc/CA
-+CA_cert_file    /usr/local/certs/bjorb.pem
-+CA_cert_path    /usr/local/certs/CA
++CA_cert_file    /etc/bjorb/bjorb.pem
++CA_cert_path    /etc/bjorb/CA
  max_connection  100
  spare_servers   1
  
