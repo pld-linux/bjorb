@@ -1,0 +1,104 @@
+#!/bin/sh
+#
+# bjorb		Bjorb - secure TCP relay software
+#
+# chkconfig:	345 14 91
+#
+# description:	Bjorb is secure TCP relay software. Bjorb provides you, secure \
+#		end-to-end connection over insecure network such as Internet.\
+#		Features:\
+#		 1. Encrypt/decrypt any "static port" TCP connection with SSL.\
+#		 2. Restrcit access by IP address.\
+#		 3. Server side certification.\
+#		 4. Client side certification.\
+#
+# pidfile:	/var/run/bjorb.pid
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# Get network config
+. /etc/sysconfig/network
+
+# Get service config - may override defaults
+[ -f /etc/sysconfig/bjorb ] && . /etc/sysconfig/bjorb
+
+# Check that networking is up.
+if is_yes "${NETWORKING}"; then
+	if [ ! -f /var/lock/subsys/network ]; then
+		# nls "ERROR: Networking is down. %s can't be run." bjorb
+		msg_network_down bjorb
+		exit 1
+	fi
+else
+	exit 0
+fi
+
+
+# See how we were called.
+case "$1" in
+  start)
+	# Check if the service is already running?
+	if [ ! -f /var/lock/subsys/bjorb ]; then
+		# show "Starting %s service" bjorb
+		msg_starting Bjorb
+		daemon bjorb -D
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/bjorb
+	else
+		# show "%s service is already running." bjorb
+		msg_already_running Bjorb
+	fi
+	;;
+  stop)
+	if [ -f /var/lock/subsys/bjorb ]; then
+		# Stop daemons.
+		# show "Stopping %s service" bjorb
+		msg_stopping Bjorb
+		killproc bjorb
+		rm -f /var/lock/subsys/bjorb
+	else
+		# show "%s service is not running." bjorb
+		msg_not_running Bjorb
+	fi
+	;;
+  restart)
+	$0 stop
+	$0 start
+	exit $?
+	;;
+  reload)
+	if [ -f /var/lock/subsys/bjorb ]; then
+		# show "Reload %s service" bjorb
+		msg_reloading Bjorb
+		killproc bjorb -HUP
+		RETVAL=$?
+	else
+		# show "%s service is not running." bjorb
+		msg_not_running bjorb >&2
+		RETVAL=7
+	fi
+	;;
+  force-reload)
+	# if program allows reloading without stopping
+	$0 reload
+
+	# or if it doesn't
+	$0 restart
+
+	exit $?
+	;;
+  status)
+	status bjorb
+	RETVAL=$?
+	;;
+  *)
+	# show "Usage: %s {start|stop|restart|reload|force-reload|status}"
+	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
+	exit 3
+esac
+
+exit $RETVAL
+
+# This must be last line !
+# vi:syntax=sh:tw=78:ts=8:sw=4
