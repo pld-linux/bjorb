@@ -26,7 +26,6 @@
 # Check that networking is up.
 if is_yes "${NETWORKING}"; then
 	if [ ! -f /var/lock/subsys/network ]; then
-		# nls "ERROR: Networking is down. %s can't be run." bjorb
 		msg_network_down bjorb
 		exit 1
 	fi
@@ -40,25 +39,21 @@ case "$1" in
   start)
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/bjorb ]; then
-		# show "Starting %s service" bjorb
 		msg_starting Bjorb
 		daemon bjorb -D
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/bjorb
 	else
-		# show "%s service is already running." bjorb
 		msg_already_running Bjorb
 	fi
 	;;
   stop)
 	if [ -f /var/lock/subsys/bjorb ]; then
 		# Stop daemons.
-		# show "Stopping %s service" bjorb
 		msg_stopping Bjorb
 		killproc bjorb
 		rm -f /var/lock/subsys/bjorb
 	else
-		# show "%s service is not running." bjorb
 		msg_not_running Bjorb
 	fi
 	;;
@@ -69,12 +64,10 @@ case "$1" in
 	;;
   reload)
 	if [ -f /var/lock/subsys/bjorb ]; then
-		# show "Reload %s service" bjorb
 		msg_reloading Bjorb
 		killproc bjorb -HUP
 		RETVAL=$?
 	else
-		# show "%s service is not running." bjorb
 		msg_not_running bjorb >&2
 		RETVAL=7
 	fi
@@ -93,7 +86,6 @@ case "$1" in
 	RETVAL=$?
 	;;
   *)
-	# show "Usage: %s {start|stop|restart|reload|force-reload|status}"
 	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
 	exit 3
 esac
