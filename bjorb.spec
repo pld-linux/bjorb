@@ -15,11 +15,11 @@ URL:		http://www.hitachi-ms.co.jp/bjorb/
 BuildRequires:	autoconf
 BuildRequires:	libstdc++-devel
 BuildRequires:	openssl-devel
-Requires:	rc-scripts
 Requires(post,preun):	/sbin/chkconfig
+Requires:	rc-scripts
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_sysconfdir	/etc/%{name}	
+%define		_sysconfdir	/etc/%{name}
 
 %description
 Bjorb is secure TCP relay software. Bjorb provides you, secure
