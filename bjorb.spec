@@ -1,5 +1,5 @@
 Summary:	Bjorb - secure TCP relay software
-Summary(pl.UTF-8):   Bjorb - oprogramowanie do bezpiecznego przekazywania TCP
+Summary(pl.UTF-8):	Bjorb - oprogramowanie do bezpiecznego przekazywania TCP
 Name:		bjorb
 Version:	0.5.5p1
 Release:	0.1
