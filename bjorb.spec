@@ -1,5 +1,5 @@
 Summary:	Bjorb - secure TCP relay software
-Summary(pl):	Bjorb - oprogramowanie do bezpiecznego przekazywania TCP
+Summary(pl.UTF-8):   Bjorb - oprogramowanie do bezpiecznego przekazywania TCP
 Name:		bjorb
 Version:	0.5.5p1
 Release:	0.1
@@ -31,13 +31,13 @@ Features:
 - Server side certification.
 - Client side certification.
 
-%description -l pl
+%description -l pl.UTF-8
 Bjorb to oprogramowanie do bezpiecznego przekazywania TCP. Bjorb
-udostêpnia bezpieczne po³±czenie koñcówek przez niebezpieczn± sieæ
-tak± jak Internet. Mo¿liwo¶ci:
-- Szyfrowanie/odszyfrowywanie dowolnego po³±czenia TCP na "statycznym
-  porcie" przy u¿yciu SSL
-- Ograniczanie dostêpu wed³ug adresów IP.
+udostÄ™pnia bezpieczne poÅ‚Ä…czenie koÅ„cÃ³wek przez niebezpiecznÄ… sieÄ‡
+takÄ… jak Internet. MoÅ¼liwoÅ›ci:
+- Szyfrowanie/odszyfrowywanie dowolnego poÅ‚Ä…czenia TCP na "statycznym
+  porcie" przy uÅ¼yciu SSL
+- Ograniczanie dostÄ™pu wedÅ‚ug adresÃ³w IP.
 - Certyfikacja po stronie serwera.
 - Certyfikacja po stronie klienta.
 
